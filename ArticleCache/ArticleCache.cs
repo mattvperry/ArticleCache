@@ -9,13 +9,12 @@ namespace ArticleCache
 
         private readonly Dictionary<Guid, LinkedListNode<Article>> articleLookup;
 
-        private LinkedListNode<Article> head = null;
-
-        private LinkedListNode<Article> tail = null;
+        private readonly LinkedList<Article> sortedArticles;
 
         public ArticleCache()
         {
             this.articleLookup = new Dictionary<Guid, LinkedListNode<Article>>();
+            this.sortedArticles = new LinkedList<Article>();
         }
 
         public int Count
@@ -28,38 +27,22 @@ namespace ArticleCache
 
         public Article CreateArticle(string articleBody)
         {
-            if (this.articleLookup.Count >= MAX_ARTICLES)
+            var article = new Article
             {
-                this.articleLookup.Remove(head.Value.Id);
-                head = head.Next;
-                head.Previous = null;
-            }
-
-            var node = new LinkedListNode<Article>
-            {
-                Next = null,
-                Previous = tail,
-                Value = new Article
-                {
-                    Id = Guid.NewGuid(),
-                    Body = articleBody,
-                    LastAccessedTime = DateTime.Now
-                }
+                Id = Guid.NewGuid(),
+                Body = articleBody,
+                LastAccessedTime = DateTime.Now
             };
 
-            if (this.Count == 0)
+            if (this.articleLookup.Count >= MAX_ARTICLES)
             {
-                head = node;
-                tail = node;
-            }
-            else
-            {
-                tail.Next = node;
-                tail = tail.Next;
+                this.articleLookup.Remove(this.sortedArticles.First.Value.Id);
+                this.sortedArticles.RemoveFirst();
             }
 
-            this.articleLookup[tail.Value.Id] = tail;
-            return tail.Value;
+            this.sortedArticles.AddLast(article);
+            this.articleLookup[article.Id] = this.sortedArticles.Last;
+            return article;
         }
 
         public Article GetByGuid(Guid id)
@@ -67,12 +50,8 @@ namespace ArticleCache
             var node = this.articleLookup[id];
             node.Value.LastAccessedTime = DateTime.Now;
 
-            node.Previous.Next = node.Next;
-            node.Next.Previous = node.Previous;
-
-            tail.Next = node;
-            node.Previous = tail;
-            node.Next = null;
+            this.sortedArticles.Remove(node);
+            this.sortedArticles.AddLast(node);
 
             return node.Value;
         }
