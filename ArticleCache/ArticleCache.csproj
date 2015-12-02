@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="Article.cs" />
     <Compile Include="ArticleCache.cs" />
-    <Compile Include="LinkedListNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

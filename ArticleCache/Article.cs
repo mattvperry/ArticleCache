@@ -4,7 +4,12 @@ namespace ArticleCache
 {
     public class Article
     {
-        public Guid Id { get; set; }
+        public Article()
+        {
+            this.Id = Guid.NewGuid();
+        }
+
+        public Guid Id { get; }
 
         public string Body { get; set; }
 

@@ -25,24 +25,18 @@ namespace ArticleCache
             }
         }
 
-        public Article CreateArticle(string articleBody)
+        public void AddArticle(Article article)
         {
-            var article = new Article
-            {
-                Id = Guid.NewGuid(),
-                Body = articleBody,
-                LastAccessedTime = DateTime.Now
-            };
-
             if (this.articleLookup.Count >= MAX_ARTICLES)
             {
                 this.articleLookup.Remove(this.sortedArticles.First.Value.Id);
                 this.sortedArticles.RemoveFirst();
             }
 
+            // Here we make the assumption that article.LastAccessedTime will always be DateTime.Now
+            // when adding to the cache
             this.sortedArticles.AddLast(article);
             this.articleLookup[article.Id] = this.sortedArticles.Last;
-            return article;
         }
 
         public Article GetByGuid(Guid id)
